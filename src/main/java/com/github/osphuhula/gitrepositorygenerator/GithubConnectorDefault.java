@@ -3,6 +3,7 @@ package com.github.osphuhula.gitrepositorygenerator;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 
 import com.github.osphuhula.gitrepositorygenerator.beans.GithubConnectionProperties;
@@ -20,11 +21,11 @@ public final class GithubConnectorDefault
 	}
 
 	@Override
-	public GithubOperation connect() {
+	public GitHub connect() {
 		Properties properties = connectionProperties.asProperties();
 		GitHubBuilder builder = GitHubBuilder.fromProperties(properties);
 		try {
-			return new GithubOperationDefault(builder.build());
+			return builder.build();
 		} catch (IOException e) {
 			String message = "Could not connect to github:" + connectionProperties.getEndpoint();
 			throw new DefaultRuntimeException(message);
