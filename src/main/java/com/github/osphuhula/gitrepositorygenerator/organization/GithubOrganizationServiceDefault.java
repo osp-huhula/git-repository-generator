@@ -91,7 +91,8 @@ public class GithubOrganizationServiceDefault
 		GHOrganization ghOrganization = getOrganization(organization);
 		GHCreateRepositoryBuilder builder = ghOrganization
 			.createRepository(repository)
-			.description(description);
+			.description(description)
+			.autoInit(true);
 		try {
 			builder.create();
 		} catch (Exception e) {

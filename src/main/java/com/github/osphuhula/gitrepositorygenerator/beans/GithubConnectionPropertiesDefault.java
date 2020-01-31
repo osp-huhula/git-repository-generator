@@ -33,4 +33,18 @@ public final class GithubConnectionPropertiesDefault
 	public String getEndpoint() {
 		return properties.getProperty("endpoint");
 	}
+
+	public String getOAuth() {
+		return properties.getProperty("oauth");
+	}
+
+	@Override
+	public String getAuthorizationU() {
+		return properties.getProperty("user");
+	}
+
+	@Override
+	public String getgetAuthorizationP() {
+		return properties.getProperty("oauth");
+	}
 }

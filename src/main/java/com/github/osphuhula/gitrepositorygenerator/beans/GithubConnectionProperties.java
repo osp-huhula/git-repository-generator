@@ -7,4 +7,8 @@ public interface GithubConnectionProperties {
 	Properties asProperties();
 
 	String getEndpoint();
+
+	String getAuthorizationU();
+
+	String getgetAuthorizationP();
 }

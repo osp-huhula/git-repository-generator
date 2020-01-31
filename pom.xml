@@ -25,6 +25,16 @@
 			<artifactId>org.eclipse.egit.github.core</artifactId>
 			<version>2.1.5</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.11</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.10.2</version>
+		</dependency>
 		<!-- TEST -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
