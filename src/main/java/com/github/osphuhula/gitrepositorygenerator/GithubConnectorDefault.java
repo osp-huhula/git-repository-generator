@@ -23,12 +23,13 @@ public final class GithubConnectorDefault
 	@Override
 	public GitHub connect() {
 		Properties properties = connectionProperties.asProperties();
-		GitHubBuilder builder = GitHubBuilder.fromProperties(properties);
+		GitHubBuilder builder = GitHubBuilder
+				.fromProperties(properties);
 		try {
 			return builder.build();
 		} catch (IOException e) {
 			String message = "Could not connect to github:" + connectionProperties.getEndpoint();
-			throw new DefaultRuntimeException(message);
+			throw new DefaultRuntimeException(message, e);
 		}
 	}
 }

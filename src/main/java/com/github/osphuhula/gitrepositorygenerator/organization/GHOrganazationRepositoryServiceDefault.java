@@ -1,12 +1,16 @@
 package com.github.osphuhula.gitrepositorygenerator.organization;
 
+import java.io.File;
+
 import org.kohsuke.github.GHRepository;
 
 import com.github.osphuhula.gitrepositorygenerator.DefaultRuntimeException;
 import com.github.osphuhula.gitrepositorygenerator.branch.GHBranchService;
+import com.github.osphuhula.gitrepositorygenerator.io.FileContentReaderDefault;
 
 public class GHOrganazationRepositoryServiceDefault {
 
+	private final FileContentReaderDefault reader = new FileContentReaderDefault();
 	private final GHOrganizationService organizationService;
 	private final GHBranchService branchService;
 
@@ -49,8 +53,8 @@ public class GHOrganazationRepositoryServiceDefault {
 		String repositoryName,
 		String team) {
 		if (!organizationService.hasRepository(organization, repositoryName)) {
-			GHRepository r = organizationService.getRepository(organization, repositoryName);
-			organizationService.addRepository(organization, r);
+			GHRepository ghRepository = organizationService.getRepository(organization, repositoryName);
+			organizationService.addRepository(organization, ghRepository);
 		}
 		if (!organizationService.hasTeam(organization, repositoryName, team)) {
 			organizationService.addRepositoryTeam(organization, repositoryName, team);
@@ -63,6 +67,34 @@ public class GHOrganazationRepositoryServiceDefault {
 		String user,
 		String team) {
 		branchService.protectBranch(organization, repository, user, team);
+	}
+
+	public void addContent(
+		String organization,
+		String repository,
+		String path,
+		File resource) {
+		String content = reader.readContent(resource.getPath());
+		branchService.addFile(organization, repository, path, content);
+	}
+
+	public void addContent(
+		String organization,
+		String repository,
+		String branch,
+		String path,
+		String content) {
+		branchService.addFile(organization, repository, branch, path, content);
+	}
+
+	public void addContent(
+		String organization,
+		String repository,
+		String branch,
+		String path,
+		File resource) {
+		String content = reader.readContent(resource.getPath());
+		branchService.addFile(organization, repository, branch, path, content);
 	}
 
 }

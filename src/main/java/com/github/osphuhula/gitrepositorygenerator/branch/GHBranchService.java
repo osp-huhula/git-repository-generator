@@ -8,4 +8,17 @@ public interface GHBranchService {
 		String repository,
 		String user,
 		String team);
+
+	void addFile(
+		String organization,
+		String repository,
+		String path,
+		String content);
+
+	void addFile(
+		String organization,
+		String repository,
+		String branch,
+		String path,
+		String content);
 }
