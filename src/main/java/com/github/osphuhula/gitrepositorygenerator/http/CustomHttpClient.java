@@ -10,4 +10,8 @@ public interface CustomHttpClient {
 		String url,
 		String body,
 		Map<String, String> header);
+
+	HttpResponse get(
+		String url,
+		Map<String, String> header);
 }
