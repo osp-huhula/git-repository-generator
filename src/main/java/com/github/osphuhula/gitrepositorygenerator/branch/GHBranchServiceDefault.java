@@ -1,5 +1,6 @@
 package com.github.osphuhula.gitrepositorygenerator.branch;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.HashMap;
@@ -13,13 +14,16 @@ import org.apache.http.ParseException;
 import org.apache.http.StatusLine;
 import org.apache.http.util.EntityUtils;
 
+import com.github.osphuhula.gitrepositorygenerator.beans.BranchFileContent;
 import com.github.osphuhula.gitrepositorygenerator.beans.GithubConnectionProperties;
 import com.github.osphuhula.gitrepositorygenerator.http.CustomHttpClient;
+import com.github.osphuhula.gitrepositorygenerator.io.FileContentReaderDefault;
 
 public class GHBranchServiceDefault
 	implements
 	GHBranchService {
 
+	private final FileContentReaderDefault reader = new FileContentReaderDefault();
 	private final CustomHttpClient httpClient;
 	private final GithubConnectionProperties connectionProperties;
 
@@ -36,34 +40,59 @@ public class GHBranchServiceDefault
 		String organization,
 		String repository,
 		String branch,
-		String path,
-		String content) {
-		String encodedContent = encode(content);
-		String body = "{ \"message\": \"automatic commit\", \"content\": \"" + encodedContent + "\", \"branch\": \"" + branch + "\" }";
-		_addFile(organization, repository, path, body);
+		String fileName,
+		File resource) {
+		addFile(organization, repository, branch, fileName, toContent(resource));
 	}
 
 	@Override
 	public void addFile(
 		String organization,
 		String repository,
-		String path,
-		String content
-		) {
-		String encodedContent = encode(content);
-		String body = "{ \"message\": \"automatic commit\", \"content\": \"" + encodedContent + "\" }";
-
-		_addFile(organization, repository, path, body);
+		String branch,
+		String fileName,
+		BranchFileContent content) {
+		if (!hasBranch(organization, repository, branch)) {
+			createBranch(organization, repository, path, resource);
+		}
+		String encodedContent = encode(content.getContent());
+		String body = "{ \"message\": \"automatic commit\", \"content\": \"" + encodedContent + "\", \"branch\": \"" + branch + "\" }";
+		requestAddFile(organization, repository, fileName, body);
 	}
 
-	private void _addFile(
+	@Override
+	public void addFile(
 		String organization,
 		String repository,
-		String path,
+		String fileName,
+		File resource) {
+		addFile(organization, repository, fileName, toContent(resource));
+	}
+
+	@Override
+	public void addFile(
+		String organization,
+		String repository,
+		String fileName,
+		BranchFileContent content) {
+		String encodedContent = encode(content.getContent());
+		String body = "{ \"message\": \"automatic commit\", \"content\": \"" + encodedContent + "\" }";
+		requestAddFile(organization, repository, fileName, body);
+	}
+
+	private BranchFileContent toContent(
+		File resource) {
+		return () -> reader.readContent(resource.getPath());
+	}
+
+	private void requestAddFile(
+		String organization,
+		String repository,
+		String fileName,
 		String body) {
 		String host = connectionProperties.getEndpoint();
 		String pattternURL = "%s/repos/%s/%s/contents/%s";
-		String url = String.format(pattternURL, host, organization, repository, path);
+		String url = String.format(pattternURL, host, organization, repository, fileName);
 		HttpResponse response = httpClient.put(url, body, header());
 		StatusLine statusLine = response.getStatusLine();
 		if (HttpStatus.SC_CREATED != statusLine.getStatusCode()) {
@@ -73,6 +102,18 @@ public class GHBranchServiceDefault
 				throw new IllegalStateException(e);
 			}
 		}
+	}
+
+	private boolean hasBranch(
+		String organization,
+		String repository,
+		String branch) {
+		String host = connectionProperties.getEndpoint();
+		String pattternURL = "%s/repos/%s/%s/branches/%s";
+		String url = String.format(pattternURL, host, organization, repository, branch);
+		HttpResponse response = httpClient.get(url, header());
+		StatusLine statusLine = response.getStatusLine();
+		return HttpStatus.SC_OK != statusLine.getStatusCode();
 	}
 
 	@Override
@@ -109,7 +150,7 @@ public class GHBranchServiceDefault
 		header.put(HttpHeaders.CONTENT_TYPE, "application/json");
 		header.put(HttpHeaders.ACCEPT, "application/vnd.github.luke-cage-preview+json");
 		String u = connectionProperties.getAuthorizationU();
-		String p = connectionProperties.getgetAuthorizationP();
+		String p = connectionProperties.getAuthorizationP();
 		String authorization = String.format("%s:%s", u, p);
 		String encoding = encode(authorization);
 		header.put(HttpHeaders.AUTHORIZATION, "Basic " + encoding);
