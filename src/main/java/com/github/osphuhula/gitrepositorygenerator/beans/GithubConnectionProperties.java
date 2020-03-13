@@ -10,5 +10,5 @@ public interface GithubConnectionProperties {
 
 	String getAuthorizationU();
 
-	String getgetAuthorizationP();
+	String getAuthorizationP();
 }

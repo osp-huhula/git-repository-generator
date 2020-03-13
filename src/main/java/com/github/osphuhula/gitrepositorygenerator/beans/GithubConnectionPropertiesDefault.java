@@ -44,7 +44,7 @@ public final class GithubConnectionPropertiesDefault
 	}
 
 	@Override
-	public String getgetAuthorizationP() {
+	public String getAuthorizationP() {
 		return properties.getProperty("oauth");
 	}
 }
